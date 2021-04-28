@@ -13,41 +13,45 @@ compilation tool with per-project core and library dependencies support.
 2.  Go to your Arduino sketch folder which contains the main `.ino` file.
 
 3.  Create `project.yaml` with the following content:
+```yaml
+# Filename of the project's main sketch
+sketch: EspTest.ino
+# Sketch version (optional; appended to filename of compiled binary file)
+version: 1.0.0
 
-    ```yaml
-    # Filename of the project's main sketch
-    sketch: Blink.ino
-    # Sketch version (optional; appended to filename of compiled binary file)
-    version: 1.0.0
+# Compilation target
+target:
+  
+  # Arduino core name
+  core: esp32:esp32      # Installs the latest version; or
+  # Arduino board FQBN string (obtained from `arduino-cli board list`)
+  board: esp32:esp32:esp32
+  # Additional board manager URL for core installation (optional)
+  url: https://dl.espressif.com/dl/package_esp32_index.json
 
-    # Compilation target
-    target:
-      # Arduino core name
-      core: arduino:samd            # Installs the latest version; or
-      # core: arduino:samd==1.6.21  # Installs v1.6.21
-      # Arduino board FQBN string (obtained from `arduino-cli board list`)
-      board: arduino:samd:mkrzero
-      # Additional board manager URL for core installation (optional)
-      url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
-
-    # Libraries to be included for compilation
-    libraries:
-      - Arduino Low Power           # Installs the latest version; or
-      # - Arduino Low Power==1.2.1  # Installs v1.2.1
-    ```
+# Libraries to be included for compilation
+libraries:
+  - ArduinoJson
+  - EspMQTTClient
+  - Adafruit MPU6050
+  - Adafruit SSD1306
+  - MPU6050_tockn
+  - PubSubClient
+  - WiFi
+  
+  # - Arduino Low Power==1.2.1  # Installs v1.2.1
+```
 
 4.  Download `arduino-cli-compile` to a `PATH` directory and make it executable.
 
 5.  Run `arduino-cli-compile path/to/sketch/folder`.
 
-6.  The compiled binary file will appear in `dist/` inside the sketch folder.
+6.  The compiled binary file will appear inside the current sketch folder with the name sketch.ino.bin.
 
-7.  Upload the compiled binary file to your Arduino board. This part is not 
-    (yet) Dockerized. For example, you can use `arduino-cli` installed on your 
-    machine connecting to the board:
+
 
     ```bash
-    arduino-cli upload -p /dev/ttyACM0 -b arduino:samd:mkrzero -i path/to/bin/file
+    arduino-cli upload -p /dev/ttyUSB0 -b esp32:esp32:esp32 -i path/to/bin/file
     ```
 
-8.  Watch your board blinking!
+7.  Watch your board blinking!
