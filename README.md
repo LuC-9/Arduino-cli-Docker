@@ -1,4 +1,4 @@
-# Arduino CLI Compile
+# Arduino CLI Docker
 
 [![https://img.shields.io/docker/pulls/macroyau/arduino-cli-compile](https://img.shields.io/docker/pulls/macroyau/arduino-cli-compile)](https://hub.docker.com/r/macroyau/arduino-cli-compile)
 
