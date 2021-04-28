@@ -52,6 +52,6 @@ libraries:
 
     ```bash
     arduino-cli upload -p /dev/ttyUSB0 -b esp32:esp32:esp32 -i path/to/bin/file
-    ```
+    ```/dev/ttyUSB0 is serial port of my device
 
 7.  Watch your board blinking!
