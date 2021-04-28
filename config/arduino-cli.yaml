@@ -9,6 +9,6 @@ directories:
   downloads: /root/.arduino15/staging
   user: /root/Arduino
 logging:
-  file: " "
+  file: ""
   format: text
   level: info
