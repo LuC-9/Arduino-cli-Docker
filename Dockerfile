@@ -14,6 +14,6 @@ COPY compile.py /usr/src/app/
 #RUN chmod +x /usr/src/sketch/init.sh
 WORKDIR /usr/src
 
-ENTRYPOINT ["python", "-u", "/usr/src/app/compile.py"]
+#ENTRYPOINT ["python", "-u", "/usr/src/app/compile.py"]
 #CMD [ "sh", "/usr/src/app/init.sh" ]
-CMD [ "python", "-u", "/usr/src/app/compile.py" ]
+#CMD [ "python", "-u", "/usr/src/app/compile.py" ]
