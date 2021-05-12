@@ -5,6 +5,8 @@ import sys
 import yaml
 import glob
 import shutil
+from subprocess import Popen
+import git
 def compile_sketch(spec):
     sketch = None
     board = None
@@ -125,6 +127,21 @@ def _run_shell_command(arguments, stdout=False, stderr=True):
 
 
 if __name__ == "__main__":
+    
+    objecturl=str(input())
+    print(objecturl)
+    print(os.listdir())
+    print(os.getcwd())
+    objectdir='sketch'
+    #Process=Popen('/usr/src/app/init.sh %s ' % (str(objecturl)))
+    #os.system('git clone %s %s',objecturl,objectdir)
+    git.Repo.clone_from(objecturl, '/usr/src/sketch')
+    print(os.listdir())
+    #os.system('bash ./init.sh %s '% (str(objecturl)))
+    os.chdir('/usr/src/sketch')
+    print(os.listdir())
+    
+    print("***************LookAbove**************")
     try:
         print(os.listdir())
         f = open("project.yaml", "r")
@@ -136,7 +153,7 @@ if __name__ == "__main__":
             #print(file)
             print("@@@@@@@@@@@@@@@@@")
         print(os.listdir())
-        os.remove("sketch.ino") 
+        #os.remove("sketch.ino") 
         
         sys.exit(0)
     except IOError as e:
