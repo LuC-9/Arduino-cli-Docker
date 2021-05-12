@@ -128,7 +128,7 @@ def _run_shell_command(arguments, stdout=False, stderr=True):
 
 if __name__ == "__main__":
     
-    objecturl=str(input())
+    objecturl=str(os.environ['GITHUB_REPOURL'])
     print(objecturl)
     print(os.listdir())
     print(os.getcwd())
