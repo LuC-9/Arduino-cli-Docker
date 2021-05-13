@@ -42,7 +42,7 @@ libraries:
   # - Arduino Low Power==1.2.1  # Installs v1.2.1
 ```
 
-4.  Build the Dockerfile or use our image Bucket name Used for now is arduino-binaries-tattva-cloud (You can Specify your bucket name in compile.py comments are provided for your help)
+4.  Build the Dockerfile or use our image, Bucket name Used for now is arduino-binaries-tattva-cloud (You can Specify your bucket name in compile.py comments are provided for your help)
 
 5.  Run `sudo docker run -it -e GITHUB_REPOURL=https://github.com/XYZ(specify the url) -e AWS_ACCESS_KEY=(access key of S3) -e AWS_SECRET_KEY=(Secret key of S3) (DockerImageName) `.
 
