@@ -160,7 +160,7 @@ if __name__ == "__main__":
         compile_sketch(spec)
         #print(os.getcwd())
         print("UPLOADING>>>>>>>>>>>>>>")
-        #os.remove("sketch.ino") 
+        #Specify your bucket name below
         uploaded = upload_to_aws('sketch.ino.bin', 'arduino-binaries-tattva-cloud', 'sketch.bin')
         sys.exit(0)
     except IOError as e:
