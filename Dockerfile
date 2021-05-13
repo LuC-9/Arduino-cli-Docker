@@ -7,6 +7,7 @@ RUN arduino-cli core install esp32:esp32
 RUN pip install --no-cache-dir pyyaml
 RUN pip install pyserial
 RUN pip install gitpython
+RUN pip install boto3
 RUN arduino-cli core install esp32:esp32 --config-file .arduino-cli.yaml
 RUN arduino-cli core update-index
 COPY compile.py /usr/src/app/
@@ -16,4 +17,4 @@ WORKDIR /usr/src
 
 #ENTRYPOINT ["python", "-u", "/usr/src/app/compile.py"]
 #CMD [ "sh", "/usr/src/app/init.sh" ]
-#CMD [ "python", "-u", "/usr/src/app/compile.py" ]
+CMD [ "python", "-u", "/usr/src/app/compile.py" ]

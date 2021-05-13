@@ -5,14 +5,14 @@ import sys
 import yaml
 import glob
 import shutil
-from subprocess import Popen
 import git
+import boto3
 def compile_sketch(spec):
     sketch = None
     board = None
     for file in glob.glob("*.ino"):
             #print(file)
-            print("@@@@@@@@@@@@@@@@@")
+            print("------------------------------------------------------")
     my_file = file
     fileA = open(my_file, 'rb')
     fileB = open("sketch.ino", 'wb')
@@ -63,9 +63,7 @@ def compile_sketch(spec):
 
     output_path = sketch.split(".")[0]
     
-    print("#############################")
-
-    print("#############################3")
+    
     
     if "version" in spec:
         output_path += "_v" + spec["version"].replace(".", "_")
@@ -107,13 +105,28 @@ def _compile_arduino_sketch(sketch_path, board, output_path):
     print("+++++++++++++++++++")
     sketch=os.getcwd()
     print(sketch)
-    #return _run_shell_command(["arduino-cli compile --fqbn esp32:esp32:esp32 --preserve-temp-files --pref build.path=/build/ /usr/src/sketchsketch.ino"], stdout=True)
     return _run_shell_command(["arduino-cli", "compile",
                                "-b", board,"--output-dir",sketch,
                                
                                sketch_path], stdout=True)
 
     sketch_path+=".bin"
+    
+    
+def upload_to_aws(local_file, bucket, s3_file):
+    s3 = boto3.client('s3', aws_access_key_id=access,
+                      aws_secret_access_key=secret)
+
+    try:
+        s3.upload_file(local_file, bucket, s3_file)
+        print("Upload Successful")
+        return True
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
     
 
 
@@ -127,34 +140,28 @@ def _run_shell_command(arguments, stdout=False, stderr=True):
 
 
 if __name__ == "__main__":
-    
     objecturl=str(os.environ['GITHUB_REPOURL'])
+    access = str(os.environ['AWS_ACCESS_KEY'])
+    secret = str(os.environ['AWS_SECRET_KEY'])
     print(objecturl)
-    print(os.listdir())
-    print(os.getcwd())
+    #print(os.listdir())
+    #print(os.getcwd())
     objectdir='sketch'
-    #Process=Popen('/usr/src/app/init.sh %s ' % (str(objecturl)))
-    #os.system('git clone %s %s',objecturl,objectdir)
     git.Repo.clone_from(objecturl, '/usr/src/sketch')
-    print(os.listdir())
-    #os.system('bash ./init.sh %s '% (str(objecturl)))
+    print("Repository elements are.....")
     os.chdir('/usr/src/sketch')
-    print(os.listdir())
     
-    print("***************LookAbove**************")
+    
+    #print("***************LookAbove**************")
     try:
         print(os.listdir())
         f = open("project.yaml", "r")
-        
         spec = yaml.safe_load(f)
         compile_sketch(spec)
-        print(os.getcwd())
-        for file in glob.glob("*.ino"):
-            #print(file)
-            print("@@@@@@@@@@@@@@@@@")
-        print(os.listdir())
+        #print(os.getcwd())
+        print("UPLOADING>>>>>>>>>>>>>>")
         #os.remove("sketch.ino") 
-        
+        uploaded = upload_to_aws('sketch.ino.bin', 'arduino-binaries-tattva-cloud', 'sketch.bin')
         sys.exit(0)
     except IOError as e:
         print("Specification file project.yaml not found")
