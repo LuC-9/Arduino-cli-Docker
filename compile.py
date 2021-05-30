@@ -1,4 +1,5 @@
 import datetime
+import time
 import os
 import subprocess
 import sys
@@ -7,6 +8,7 @@ import glob
 import shutil
 import git
 import boto3
+from botocore.config import Config
 def compile_sketch(spec):
     sketch = None
     board = None
@@ -105,21 +107,43 @@ def _compile_arduino_sketch(sketch_path, board, output_path):
     print("+++++++++++++++++++")
     sketch=os.getcwd()
     print(sketch)
-    return _run_shell_command(["arduino-cli", "compile",
-                               "-b", board,"--output-dir",sketch,
-                               
-                               sketch_path], stdout=True)
+
+    flag_list = ''
+    for item, value in os.environ.items():
+        if item.startswith("AF_"):
+            flag_list += """-D{}="{}" """.format(item,value)
+
+    compile_flags=r"""compiler.cpp.extra_flags='{}'""".format(flag_list)
+    return _run_shell_command(["arduino-cli", "compile","-b", board,"--output-dir" , sketch,"--build-property", compile_flags, sketch_path],stdout=True)
 
     sketch_path+=".bin"
     
     
+    
+    
+def genUrl (bucket,s3_file):
+    s3 = boto3.client('s3',aws_access_key_id=access,
+                      aws_secret_access_key=secret,region_name = 'ap-south-1',config=Config(signature_version="s3v4"),)
+    
+    try:
+        x = s3.generate_presigned_url('get_object', Params={'Bucket':bucket,'Key': s3_file,}, ExpiresIn = 3600,)
+        print (x)
+        return x
+    except ClientError as e:
+        logging.error(e)
+        return None
+    
+    
+    
 def upload_to_aws(local_file, bucket, s3_file):
     s3 = boto3.client('s3', aws_access_key_id=access,
-                      aws_secret_access_key=secret)
+                      aws_secret_access_key=secret,region_name = 'ap-south-1')
 
     try:
         s3.upload_file(local_file, bucket, s3_file)
         print("Upload Successful")
+        
+        #print (x)
         return True
     except FileNotFoundError:
         print("The file was not found")
@@ -127,10 +151,10 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         print("Credentials not available")
         return False
-    
 
 
 def _run_shell_command(arguments, stdout=False, stderr=True):
+    print(arguments)
     process = subprocess.run(arguments, check=False, capture_output=True)
     if stdout and len(process.stdout) > 0:
         print("> %s" % process.stdout.decode("utf-8"))
@@ -140,6 +164,7 @@ def _run_shell_command(arguments, stdout=False, stderr=True):
 
 
 if __name__ == "__main__":
+   
     objecturl=str(os.environ['GITHUB_REPOURL'])
     access = str(os.environ['AWS_ACCESS_KEY'])
     secret = str(os.environ['AWS_SECRET_KEY'])
@@ -151,7 +176,6 @@ if __name__ == "__main__":
     print("Repository elements are.....")
     os.chdir('/usr/src/sketch')
     
-    
     #print("***************LookAbove**************")
     try:
         print(os.listdir())
@@ -162,9 +186,13 @@ if __name__ == "__main__":
         print("UPLOADING>>>>>>>>>>>>>>")
         #Specify your bucket name below
         uploaded = upload_to_aws('sketch.ino.bin', 'arduino-binaries-tattva-cloud', 'sketch.bin')
+        time.sleep(5)
+        link=genUrl('arduino-binaries-tattva-cloud',"sketch.bin")
+        print("*****************************above link can be used to sownload the binary************************************")    
+            
         sys.exit(0)
     except IOError as e:
-        print("Specification file project.yaml not found")
+        print(e)
         print(os.getcwd())
         print(os.listdir())
         os.chdir('/usr/src/sketch/')
